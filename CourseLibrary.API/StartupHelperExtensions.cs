@@ -16,6 +16,13 @@ internal static class StartupHelperExtensions
         builder.Services.AddControllers(configure =>
         {
             configure.ReturnHttpNotAcceptable = true;
+            configure.CacheProfiles.Add("240SecCacheProfile",
+                new()
+                {
+                    Duration = 240, // 4 minutes
+                    //Location = ResponseCacheLocation.Any,
+                    //NoStore = false
+                });
         })
         .AddNewtonsoftJson(options => // This extension method is in Microsoft.AspNetCore.Mvc.NewtonsoftJson
         {
@@ -52,7 +59,7 @@ internal static class StartupHelperExtensions
             CourseLibraryRepository>();
 
         builder.Services.AddTransient<IPropertyMappingService, PropertyMappingService>();
-
+        builder.Services.AddTransient<IPropertyCheckerService, PropertyCheckerService>();
         builder.Services.AddDbContext<CourseLibraryContext>(options =>
         {
             options.UseSqlite(@"Data Source=library.db");
@@ -60,6 +67,9 @@ internal static class StartupHelperExtensions
 
         builder.Services.AddAutoMapper(
             AppDomain.CurrentDomain.GetAssemblies());
+
+
+        builder.Services.AddResponseCaching();
 
         return builder.Build();
     }
@@ -71,7 +81,9 @@ internal static class StartupHelperExtensions
         {
             app.UseDeveloperExceptionPage();
         }
- 
+        
+        app.UseResponseCaching();
+
         app.UseAuthorization();
 
         app.MapControllers(); 
