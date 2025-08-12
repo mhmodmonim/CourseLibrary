@@ -43,6 +43,7 @@ public class AuthorsController : ControllerBase
             ResourceUriType.PreviousPage => Url.Link("GetAuthors",
                 new
                 {
+                    fields = authorParams.Fields,
                     orderBy = authorParams.OrderBy,
                     pageNumber = authorParams.PageNumber - 1,
                     pageSize = authorParams.PageSize,
@@ -52,6 +53,7 @@ public class AuthorsController : ControllerBase
             ResourceUriType.NextPage => Url.Link("GetAuthors",
                 new
                 {
+                    fields = authorParams.Fields,
                     orderBy = authorParams.OrderBy,
                     pageNumber = authorParams.PageNumber + 1,
                     pageSize = authorParams.PageSize,
@@ -61,6 +63,7 @@ public class AuthorsController : ControllerBase
             _ => Url.Link("GetAuthors",
                 new
                 {
+                    fields = authorParams.Fields,
                     orderBy = authorParams.OrderBy,
                     pageNumber = authorParams.PageNumber,
                     pageSize = authorParams.PageSize,
@@ -72,7 +75,7 @@ public class AuthorsController : ControllerBase
 
 
     [HttpGet(Name = "GetAuthors")] 
-    public async Task<ActionResult<IEnumerable<AuthorDto>>> GetAuthors(
+    public async Task<IActionResult> GetAuthors(
         [FromQuery] AuthorResourceParams authorParams)
     {
 
@@ -111,7 +114,8 @@ public class AuthorsController : ControllerBase
 
 
         // return them
-        return Ok(_mapper.Map<IEnumerable<AuthorDto>>(authorsFromRepo));
+        return Ok(_mapper.Map<IEnumerable<AuthorDto>>(authorsFromRepo)
+            .ShapeData(authorParams.Fields));
     }
 
     [HttpGet("{authorId}", Name = "GetAuthor")]

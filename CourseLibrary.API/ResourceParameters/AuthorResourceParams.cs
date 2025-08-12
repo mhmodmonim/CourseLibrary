@@ -23,4 +23,6 @@ public class AuthorResourceParams
     }
 
     public string? OrderBy { get; set; } = "Name"; // default order by Name
+
+    public string? Fields { get; set; } // for field selection
 }
